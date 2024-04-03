@@ -104,5 +104,19 @@ Upload your changes to the repository. Discuss and refine answers as a team.
 
 
 ## Ishan Patel
+```{r}
+library(dplyr)
+
+# Calculate the number of Avengers who have died at least once
+avengers_died_at_least_once <- avengers %>%
+  filter(Reduce(`|`, across(starts_with("Death"), ~. == "YES")))
+
+# Calculate the percentage of Avengers who have died at least once
+percentage_died_at_least_once <- nrow(avengers_died_at_least_once) / nrow(avengers) * 100
+
+percentage_died_at_least_once
+
+# The statement is true.
+```
 
 ## Hazer Becic
