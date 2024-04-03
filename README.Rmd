@@ -120,3 +120,23 @@ percentage_died_at_least_once
 ```
 
 ## Hazer Becic
+```{r}
+
+avengers_mcu <- c("Iron Man", "Hulk", "Captain America", "Thor", "Hawkeye", "Black Widow", "Scarlet Witch", "Quicksilver", "The Vision")
+
+# Check if each of the nine Avengers has died at least once
+avengers_mcu_died <- av %>%
+  filter(Name.Alias %in% avengers_mcu) %>%
+  filter(Reduce(`|`, across(starts_with("Death"), ~. == "YES")))
+
+avengers_mcu_died
+
+```
+
+
+
+
+
+
+
+
