@@ -31,10 +31,55 @@ head(av)
 
 Get the data into a format where the five columns for Death[1-5] are replaced by two columns: Time, and Death. Time should be a number between 1 and 5 (look into the function `parse_number`); Death is a categorical variables with values "yes", "no" and "". Call the resulting data set `deaths`. 
 
+```{r}
+#imports
+library(dplyr)
+library(tidyverse)
+```
+
+```{r}
+# Define function to parse numbers
+parse_number <- function(x) as.numeric(gsub("\\D", "", x))
+
+# Replace columns for deaths
+av <- av %>%
+  pivot_longer(cols = starts_with("Death"), 
+               names_to = "Time_Death", 
+               values_to = "Death") %>%
+  mutate(Time_Death = parse_number(gsub("Death", "", Time_Death)),
+         Death = ifelse(Death == "YES", "yes", ifelse(Death == "NO", "no", ""))) %>%
+  select(-Time_Death)  # Remove the temporary column used for pivoting
+
+head(av)
+```
+
 Similarly, deal with the returns of characters.
 
+```{r}
+# Replace columns for returns
+av <- av %>%
+  pivot_longer(cols = starts_with("Return"), 
+               names_to = "Time_Return", 
+               values_to = "Return") %>%
+  mutate(Time_Return = parse_number(gsub("Return", "", Time_Return)),
+         Return = ifelse(Return == "YES", "yes", ifelse(Return == "NO", "no", ""))) %>%
+  select(-Time_Return)  # Remove the temporary column used for pivoting
+
+head(av)
+```
 Based on these datasets calculate the average number of deaths an Avenger suffers. 
 
+```{r}
+# Calculate the total number of deaths for each Avenger
+av <- av %>%
+  mutate(Total_Deaths = rowSums(select(., starts_with("Death")) == "yes", na.rm = TRUE))
+
+# Calculate the average number of deaths
+average_deaths <- mean(av$Total_Deaths, na.rm = TRUE)
+
+# Print the average number of deaths
+print(average_deaths)
+```
 ## Individually
 
 For each team member, copy this part of the report. 

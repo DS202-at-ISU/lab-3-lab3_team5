@@ -1,4 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/kHEW-1QV)
 
 <!-- README.md is generated from README.Rmd. Please edit the README.Rmd file -->
 
@@ -72,10 +71,112 @@ between 1 and 5 (look into the function `parse_number`); Death is a
 categorical variables with values “yes”, “no” and ““. Call the resulting
 data set `deaths`.
 
+``` r
+#imports
+library(dplyr)
+```
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
+library(tidyverse)
+```
+
+    ## Warning: package 'tidyr' was built under R version 4.3.3
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ forcats   1.0.0     ✔ readr     2.1.5
+    ## ✔ ggplot2   3.4.4     ✔ stringr   1.5.1
+    ## ✔ lubridate 1.9.3     ✔ tibble    3.2.1
+    ## ✔ purrr     1.0.2     ✔ tidyr     1.3.1
+
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
+# Define function to parse numbers
+parse_number <- function(x) as.numeric(gsub("\\D", "", x))
+
+# Replace columns for deaths
+av <- av %>%
+  pivot_longer(cols = starts_with("Death"), 
+               names_to = "Time_Death", 
+               values_to = "Death") %>%
+  mutate(Time_Death = parse_number(gsub("Death", "", Time_Death)),
+         Death = ifelse(Death == "YES", "yes", ifelse(Death == "NO", "no", ""))) %>%
+  select(-Time_Death)  # Remove the temporary column used for pivoting
+
+head(av)
+```
+
+    ## # A tibble: 6 × 17
+    ##   URL                 Name.Alias Appearances Current. Gender Probationary.Introl
+    ##   <chr>               <chr>            <int> <chr>    <chr>  <chr>              
+    ## 1 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 2 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 3 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 4 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 5 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 6 http://marvel.wiki… "Janet va…        1165 YES      FEMALE ""                 
+    ## # ℹ 11 more variables: Full.Reserve.Avengers.Intro <chr>, Year <int>,
+    ## #   Years.since.joining <int>, Honorary <chr>, Return1 <chr>, Return2 <chr>,
+    ## #   Return3 <chr>, Return4 <chr>, Return5 <chr>, Notes <chr>, Death <chr>
+
 Similarly, deal with the returns of characters.
+
+``` r
+# Replace columns for returns
+av <- av %>%
+  pivot_longer(cols = starts_with("Return"), 
+               names_to = "Time_Return", 
+               values_to = "Return") %>%
+  mutate(Time_Return = parse_number(gsub("Return", "", Time_Return)),
+         Return = ifelse(Return == "YES", "yes", ifelse(Return == "NO", "no", ""))) %>%
+  select(-Time_Return)  # Remove the temporary column used for pivoting
+
+head(av)
+```
+
+    ## # A tibble: 6 × 13
+    ##   URL                 Name.Alias Appearances Current. Gender Probationary.Introl
+    ##   <chr>               <chr>            <int> <chr>    <chr>  <chr>              
+    ## 1 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 2 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 3 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 4 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 5 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## 6 http://marvel.wiki… "Henry Jo…        1269 YES      MALE   ""                 
+    ## # ℹ 7 more variables: Full.Reserve.Avengers.Intro <chr>, Year <int>,
+    ## #   Years.since.joining <int>, Honorary <chr>, Notes <chr>, Death <chr>,
+    ## #   Return <chr>
 
 Based on these datasets calculate the average number of deaths an
 Avenger suffers.
+
+``` r
+# Calculate the total number of deaths for each Avenger
+av <- av %>%
+  mutate(Total_Deaths = rowSums(select(., starts_with("Death")) == "yes", na.rm = TRUE))
+
+# Calculate the average number of deaths
+average_deaths <- mean(av$Total_Deaths, na.rm = TRUE)
+
+# Print the average number of deaths
+print(average_deaths)
+```
+
+    ## [1] 0.1028902
 
 ## Individually
 
