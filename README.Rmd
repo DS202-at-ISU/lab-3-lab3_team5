@@ -38,47 +38,51 @@ library(tidyverse)
 ```
 
 ```{r}
-# Define function to parse numbers
-parse_number <- function(x) as.numeric(gsub("\\D", "", x))
-
-# Replace columns for deaths
-av <- av %>%
-  pivot_longer(cols = starts_with("Death"), 
-               names_to = "Time_Death", 
+deaths <- av %>%
+  pivot_longer(cols = starts_with("Death"),
+               names_to = "Time",
                values_to = "Death") %>%
-  mutate(Time_Death = parse_number(gsub("Death", "", Time_Death)),
-         Death = ifelse(Death == "YES", "yes", ifelse(Death == "NO", "no", ""))) %>%
-  select(-Time_Death)  # Remove the temporary column used for pivoting
+  mutate(Time = parse_number(gsub("Death", "", Time)))
 
-head(av)
+head(deaths)
 ```
 
 Similarly, deal with the returns of characters.
 
 ```{r}
 # Replace columns for returns
-av <- av %>%
-  pivot_longer(cols = starts_with("Return"), 
-               names_to = "Time_Return", 
+returns <- av %>%
+  pivot_longer(cols = starts_with("Return"),
+               names_to = "Time",
                values_to = "Return") %>%
-  mutate(Time_Return = parse_number(gsub("Return", "", Time_Return)),
-         Return = ifelse(Return == "YES", "yes", ifelse(Return == "NO", "no", ""))) %>%
-  select(-Time_Return)  # Remove the temporary column used for pivoting
+  mutate(Time = parse_number(gsub("Return", "", Time)))
 
-head(av)
+head(returns)
 ```
 Based on these datasets calculate the average number of deaths an Avenger suffers. 
 
 ```{r}
-# Calculate the total number of deaths for each Avenger
-av <- av %>%
-  mutate(Total_Deaths = rowSums(select(., starts_with("Death")) == "yes", na.rm = TRUE))
+# Drop the "Death" and "Return" columns before combining the datasets
+deaths <- deaths %>% select(-starts_with("Return"))
+returns <- returns %>% select(-starts_with("Death"))
 
-# Calculate the average number of deaths
-average_deaths <- mean(av$Total_Deaths, na.rm = TRUE)
+# Combine the deaths and returns datasets
+combined <- deaths %>%
+  left_join(select(returns, URL, Name.Alias, Time, Return), by = c("URL", "Name.Alias", "Time"))
 
-# Print the average number of deaths
-print(average_deaths)
+#Get rid of some characters with empty names
+combined_filtered <- combined %>%
+  filter(Name.Alias != "")
+
+#Get a df of each character and how many times they died
+avg_deaths <- combined_filtered %>%
+  group_by(Name.Alias) %>%
+  summarise(total_deaths = sum(Death == "YES", na.rm = TRUE))
+
+#Gets the mean of all deaths
+average_num_deaths <- mean(avg_deaths$total_deaths, na.rm = TRUE)
+
+average_num_deaths
 ```
 ## Individually
 
@@ -102,19 +106,70 @@ Upload your changes to the repository. Discuss and refine answers as a team.
 
 ## Blake Nelson
 
+### FiveThirtyEight Statement
+
+> Quote the statement you are planning to fact-check.
+
+
+  "But you can only tempt death so many times. There’s a 2-in-3 chance that a member of the Avengers returned from their first stint in the afterlife, but only a 50 percent chance they recovered from a second or third death."
+    
+### Include the code
+
+Make sure to include the code to derive the (numeric) fact for the statement
+
+```{r}
+# Count the number of unique characters who had at least one "YES" in the return column
+characters_with_return <- combined_filtered %>%
+  filter(Death == "YES") %>%
+  distinct(Name.Alias)  # Count the unique characters
+
+# Count the total number of unique characters
+total_characters <- combined_filtered %>%
+  distinct(Name.Alias)
+
+# Calculate the percentage
+percentage_with_return <- nrow(characters_with_return) / nrow(total_characters) * 100
+
+percentage_with_return
+```
+
+```{r}
+# Count the number of unique characters who returned after more than one death
+characters_with_multiple_returns <- combined_filtered %>%
+  filter(Death == "YES") %>%
+  group_by(Name.Alias) %>% 
+  summarise(num_returns = sum(Return == "YES", na.rm = TRUE)) %>%
+  filter(num_returns > 1) %>%
+  distinct(Name.Alias)  # Count the unique characters
+
+# Calculate the percentage
+percentage_with_multiple_returns <- nrow(characters_with_multiple_returns) / nrow(total_characters) * 100
+
+percentage_with_multiple_returns
+```
+### Include your answer
+
+Include at least one sentence discussing the result of your fact-checking endeavor.
+
+Upload your changes to the repository. Discuss and refine answers as a team.
+
+  There is not a 2 in 3 percent chance that a character returns after dying. it is more like 2 in 5 chance or 40%. There is also only around 5% chance that a character returns more than once.  The fact is clearly not true.
 
 ## Ishan Patel
 ```{r}
 #Out of 173 listed Avengers, my analysis found that 69 had died at least one time after they joined the team.5 That’s about 40 percent of all people who have ever signed on to the team. Let’s put it this way: If you fall from four or five stories up, there’s a 50 percent chance you die. Getting a membership card in the Avengers is roughly like jumping off a four-story building.
 
 # Calculate the number of Avengers who have died at least once
-avengers_died_at_least_once <- av %>%
-  filter(Reduce(`|`, across(starts_with("Death"), ~. == "YES")))
 
-# Calculate the percentage of Avengers who have died at least once
-percentage_died_at_least_once <- nrow(avengers_died_at_least_once) / nrow(avengers) * 100
+#Commented because it does not work
 
-percentage_died_at_least_once
+# avengers_died_at_least_once <- av %>%
+#   filter(Reduce(`|`, across(starts_with("Death"), ~. == "YES")))
+# 
+# # Calculate the percentage of Avengers who have died at least once
+# percentage_died_at_least_once <- nrow(avengers_died_at_least_once) / nrow(avengers) * 100
+# 
+# percentage_died_at_least_once
 
 # The statement is true.
 ```
