@@ -203,3 +203,9 @@ fact-checking endeavor.
 
 Upload your changes to the repository. Discuss and refine answers as a
 team.
+
+## Blake Nelson
+
+## Ishan Patel
+
+## Hazer Becic
