@@ -91,13 +91,11 @@ library(dplyr)
 library(tidyverse)
 ```
 
-    ## Warning: package 'tidyr' was built under R version 4.3.3
-
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ forcats   1.0.0     ✔ readr     2.1.5
-    ## ✔ ggplot2   3.4.4     ✔ stringr   1.5.1
+    ## ✔ ggplot2   3.5.0     ✔ stringr   1.5.1
     ## ✔ lubridate 1.9.3     ✔ tibble    3.2.1
-    ## ✔ purrr     1.0.2     ✔ tidyr     1.3.1
+    ## ✔ purrr     1.0.2     ✔ tidyr     1.3.0
 
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
@@ -277,21 +275,21 @@ not true.
 ## Ishan Patel
 
 ``` r
-#Out of 173 listed Avengers, my analysis found that 69 had died at least one time after they joined the team.5 That’s about 40 percent of all people who have ever signed on to the team. Let’s put it this way: If you fall from four or five stories up, there’s a 50 percent chance you die. Getting a membership card in the Avengers is roughly like jumping off a four-story building.
+#Out of 173 listed Avengers, my analysis found that 69 had died at least one time after they joined the team. That’s about 40 percent of all people who have ever signed on to the team. Let’s put it this way: If you fall from four or five stories up, there’s a 50 percent chance you die. Getting a membership card in the Avengers is roughly like jumping off a four-story building.
 
-# Calculate the number of Avengers who have died at least once
+percentage_died_at_least_once <- combined_filtered %>%
+  summarize(percentage_died = mean(across(starts_with("Death")) == "YES") * 100)
 
-#Commented because it does not work
+percentage_died_at_least_once
+```
 
-# avengers_died_at_least_once <- av %>%
-#   filter(Reduce(`|`, across(starts_with("Death"), ~. == "YES")))
-# 
-# # Calculate the percentage of Avengers who have died at least once
-# percentage_died_at_least_once <- nrow(avengers_died_at_least_once) / nrow(avengers) * 100
-# 
-# percentage_died_at_least_once
+    ## # A tibble: 1 × 1
+    ##   percentage_died
+    ##             <dbl>
+    ## 1            10.1
 
-# The statement is true.
+``` r
+# This claim was proved to be wrong and only 10 percent of the Avengers died at least one time.
 ```
 
 ## Hazer Becic
