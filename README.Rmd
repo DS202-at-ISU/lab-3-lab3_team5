@@ -157,21 +157,15 @@ Upload your changes to the repository. Discuss and refine answers as a team.
 
 ## Ishan Patel
 ```{r}
-#Out of 173 listed Avengers, my analysis found that 69 had died at least one time after they joined the team.5 That’s about 40 percent of all people who have ever signed on to the team. Let’s put it this way: If you fall from four or five stories up, there’s a 50 percent chance you die. Getting a membership card in the Avengers is roughly like jumping off a four-story building.
+#Out of 173 listed Avengers, my analysis found that 69 had died at least one time after they joined the team. That’s about 40 percent of all people who have ever signed on to the team. Let’s put it this way: If you fall from four or five stories up, there’s a 50 percent chance you die. Getting a membership card in the Avengers is roughly like jumping off a four-story building.
 
-# Calculate the number of Avengers who have died at least once
+percentage_died_at_least_once <- combined_filtered %>%
+  summarize(percentage_died = mean(across(starts_with("Death")) == "YES") * 100)
 
-#Commented because it does not work
+percentage_died_at_least_once
 
-avengers_died_at_least_once <- combined_filtered %>%
-  filter(Reduce(`|`, across(starts_with("Death"), ~. == "YES")))
+# This claim was proved to be wrong and only 10 percent of the Avengers died at least one time.
 
- #Calculate the percentage of Avengers who have died at least once
- percentage_died_at_least_once <- nrow(avengers_died_at_least_once) / nrow(combined_filtered) * 100
- 
- percentage_died_at_least_once
-
-# The statement is not true as the percentage of avengers that have died is 10%.
 ```
 
 ## Hazer Becic
